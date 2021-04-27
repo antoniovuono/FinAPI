@@ -8,6 +8,25 @@ app.use(express.json());
 //Array simulando um banco de dados 
 const custumers = [];
 
+//Middleware
+function verifyIfExistsAccountCPF(request, response, next) {
+
+    const { cpf } = request.headers;
+
+	const customer = custumers.find((customer) => customer.cpf === cpf);
+
+    //Validation: if customer exists
+
+    if(!customer) {
+        return response.status(400).json({ error: "Customer not found ! "});
+    }
+
+    request.customer = customer;
+
+    return next();
+    
+}
+
 app.post("/account", (request, response) => {
     const { cpf, name } = request.body;
 
@@ -29,15 +48,9 @@ app.post("/account", (request, response) => {
     return response.status(201).send();
 });
 
-app.get("/statement", (request, response) => {
+app.get("/statement", verifyIfExistsAccountCPF, (request, response) => {
 	
-	const { cpf } = request.headers;
-
-	const customer = custumers.find((customer) => customer.cpf === cpf);
-
-    if(!customer) {
-        return response.status(400).json({ error: "Customer not found ! "});
-    }
+    const { customer } = request;
 
 	return response.json(customer.statement);
 
