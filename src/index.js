@@ -162,6 +162,4 @@ app.delete("/account", verifyIfExistsAccountCPF, (request, response) => {
 
 
 
-
-
 app.listen(3333);
